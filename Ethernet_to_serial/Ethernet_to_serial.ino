@@ -341,7 +341,7 @@ void handleSubmit() {
         pass[16] = '\0';
         //EEPROM.put(EEP_PASSWORD, pass);
         storedPassword = String(pass);
-        writeString(EEP_USERNAME, storedUsername, 16);
+        writeString(EEP_PASSWORD, storedPassword, 16);
     }
 
     EEPROM.commit();
