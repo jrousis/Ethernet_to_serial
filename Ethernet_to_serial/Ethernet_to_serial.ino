@@ -147,7 +147,7 @@ void setup() {
 
     Serial2.setPins(5, 17);
     Serial2.begin(baudrate, SERIAL_8N1, 5, 17);
-    Serial2.setHwFlowCtrlMode(HW_FLOWCTRL_DISABLE);
+    Serial2.setHwFlowCtrlMode(UART_HW_FLOWCTRL_DISABLE);
     //--------------------------------------------------------------------------------
     
     // Set up Ethernet
@@ -163,6 +163,7 @@ void setup() {
     //...............................................................................
     // Set up web server
     server.on("/", handleRoot);
+    server.on("/reset", handleReset);
     server.on("/login", handleLogin);
     server.on("/submit", handleSubmit);
     server.begin();
@@ -236,21 +237,36 @@ void handleRoot() {
 
     // Build HTML form with initial values
 
-    String html = "<h2>Ethernet to Serial Link Settings</H2>";
+    String html = "<h2 style='text-align:center;'>Ethernet to Serial Link Settings</H2>";
     html += "<html><body><div style='display:flex; justify-content:center; align-items:top; height:100vh;'>";
     html += "<form action='/submit' method='POST'><table>";
     html += "<tr><td>IP Address:</td><td><input type='text' name='ip' value='" + localIP.toString() + "'></td></tr>";
     html += "<tr><td>Gate Way:</td><td><input type='text' name='gw' value='" + gateway.toString() + "'></td></tr>";
     html += "<tr><td>Subnet:</td><td><input type='text' name='subnet' value='" + subnet.toString() + "'></td></tr>";
-    //html += "<tr><td>MAC Address:</td><td><input type='text' name='mac' value='" + String(mac[0], HEX) + ":" + String(mac[1], HEX) + ":" + String(mac[2], HEX) + ":" + String(mac[3], HEX) + ":" + String(mac[4], HEX) + ":" + String(mac[5], HEX) + "'></td></tr>";
     html += "<tr><td>MAC Address:</td><td><input type='text' name='mac' value='" + WiFi.macAddress() + "'></td></tr>";
     html += "<tr><td>Port:</td><td><input type='text' name='port' value='" + String(port) + "'></td></tr>";
     html += "<tr><td>baudrate:</td><td><input type='text' name='baudrate' value='" + String(baudrate) + "'></td></tr>";
     html += "<tr><td>Username:</td><td><input type='text' name='username' value='" + String(storedUsername) + "'></td></tr>";
     html += "<tr><td>Password:</td><td><input type='text' name='password' value='" + String(storedPassword) + "'></td></tr>";
-    html += "<tr><td colspan='2' style='text-align:center;'><input type='submit' value='Submit'></td></tr>";
+    html += "<tr><td><p></p></td><td><p></p></td></tr>";
+    html += "<tr><td><button type='button' onclick=\"location.href='/reset'\">Reset device</button></td>";
+    html += "<td style='text-align:right;'><input type='submit' value='Submit'></td></tr>";
     html += "</table><p></p><hr><p>Rousis Systems LTD</p></form></div></body></html>";
     server.send(200, "text/html", html);
+}
+
+void handleReset() {
+    if (!server.authenticate(storedUsername.c_str(), storedPassword.c_str())) {
+        return server.requestAuthentication();
+    }
+    // Set default values
+    Serial.println();
+    Serial.println("User Rest");
+
+    server.send(200, "text/plain", "You pressed reset, the device is performing a hardware reset");
+
+    // made hardware reset
+    ESP.restart();
 }
 
 void handleLogin() {
