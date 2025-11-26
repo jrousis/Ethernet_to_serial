@@ -19,7 +19,7 @@
 IPAddress localIP(192, 168, 1, 19);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
-uint8_t mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 uint16_t port = 23;
 uint32_t baudrate = 9600;
 String storedUsername = "admin";
@@ -83,7 +83,7 @@ IPAddress restoreIPAddress(char add) {
 }
 
 void setup() {
-    Serial.begin(115200);    
+    Serial.begin(115200);
     EEPROM.begin(64);
     //make default pin as input and enable pullup resistor
     pinMode(DEFAULT_PIN, INPUT_PULLUP);
@@ -109,7 +109,7 @@ void setup() {
 
         // Write default values to EEPROM
         // Save IP to EEPROM
-        
+
         saveIPAddress(localIP, EEP_IP_ADDRESS);
         saveIPAddress(gateway, EEP_IP_GATEWAY);
         saveIPAddress(subnet, EEP_SUBNET);
@@ -124,32 +124,32 @@ void setup() {
         EEPROM.write(EEPROM_DEFAULT, 0x01);
         EEPROM.commit();
     }
-	else
-	{
-		// Read values from EEPROM
-		localIP = restoreIPAddress(EEP_IP_ADDRESS);
+    else
+    {
+        // Read values from EEPROM
+        localIP = restoreIPAddress(EEP_IP_ADDRESS);
         gateway = restoreIPAddress(EEP_IP_GATEWAY);
-		subnet = restoreIPAddress(EEP_SUBNET);
-		port = (EEPROM.read(EEP_PORT) << 8) | EEPROM.read(EEP_PORT + 1);
+        subnet = restoreIPAddress(EEP_SUBNET);
+        port = (EEPROM.read(EEP_PORT) << 8) | EEPROM.read(EEP_PORT + 1);
         baudrate = (EEPROM.read(EEP_BOUDRATE) << 24) | (EEPROM.read(EEP_BOUDRATE + 1) << 16) | (EEPROM.read(EEP_BOUDRATE + 2) << 8) | EEPROM.read(EEP_BOUDRATE + 3);
         storedUsername = read_String(EEP_USERNAME, 16);
         storedPassword = read_String(EEP_PASSWORD, 16);
 
         Serial.println();
-        Serial.println("Read from EEPROM"); 
+        Serial.println("Read from EEPROM");
         Serial.println("IP Address: " + localIP.toString());
         Serial.println("Subnet: " + subnet.toString());
         Serial.println("Port: " + String(port));
         Serial.println("Baudrate: " + String(baudrate));
         Serial.println("Username: " + storedUsername);
         Serial.println("Password: " + storedPassword);
-	}
+    }
 
     Serial2.setPins(5, 17);
     Serial2.begin(baudrate, SERIAL_8N1, 5, 17);
     Serial2.setHwFlowCtrlMode(UART_HW_FLOWCTRL_DISABLE);
     //--------------------------------------------------------------------------------
-    
+
     // Set up Ethernet
     ETH.begin();
     ETH.config(localIP, gateway, subnet);
@@ -294,11 +294,11 @@ void handleSubmit() {
     }
 
     if (server.hasArg("gw")) {
-		IPAddress gw;
-		gw.fromString(server.arg("gw"));
+        IPAddress gw;
+        gw.fromString(server.arg("gw"));
         saveIPAddress(gw, EEP_IP_GATEWAY);
-		//EEPROM.put(EEP_IP_GATEWAY, gw);
-	}
+        //EEPROM.put(EEP_IP_GATEWAY, gw);
+    }
 
     if (server.hasArg("subnet")) {
         Serial.println("Subnet: " + server.arg("subnet"));
@@ -329,14 +329,14 @@ void handleSubmit() {
     }
 
     if (server.hasArg("baudrate")) {
-		Serial.println("Baudrate: " + server.arg("baudrate"));
+        Serial.println("Baudrate: " + server.arg("baudrate"));
 
-		baudrate = server.arg("baudrate").toInt();
-		Serial.println("Baudrate Int.: ");
-		Serial.println(baudrate);
+        baudrate = server.arg("baudrate").toInt();
+        Serial.println("Baudrate Int.: ");
+        Serial.println(baudrate);
         EEPROM.write(EEP_BOUDRATE, baudrate >> 24); EEPROM.write(EEP_BOUDRATE + 1, (baudrate >> 16) & 0xFF);
         EEPROM.write(EEP_BOUDRATE + 2, (baudrate >> 8) & 0xFF); EEPROM.write(EEP_BOUDRATE + 3, baudrate & 0xFF);
-	}
+    }
 
     if (server.hasArg("username")) {
         Serial.println("Username: " + server.arg("username"));
